@@ -5,17 +5,17 @@ CREATE TABLE eleitor(
 	ze_numero int not null,
 	ano int not null,
 	turno int not null,
-	validacao boolean not null,
+	validacao int not null,
 	CONSTRAINT pkeleitor
-		PRIMARY KEY(cpf),
+		PRIMARY KEY(cpf, ze_numero, ano, turno),
 	CONSTRAINT UNkeleitor1
 		UNIQUE (titulo),
-	CONSTRAINT fkeleitor2
+	CONSTRAINT fkeleitor1
 		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT fkeleitor3
+	CONSTRAINT fkeleitor2
 		FOREIGN KEY(ano, turno) REFERENCES eleicao(ano, turno)
-		ON DELETE RESTRICT ON UPDATE CASCADE
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE candidato(
@@ -24,14 +24,12 @@ CREATE TABLE candidato(
 	titulo int not null,
 	c_numero int not null,
 	e_vice int,
-	sequencial int not null,
-	CONSTRAINT pkeleitor
+	sequencial int,
+	CONSTRAINT pkcandidato
 		PRIMARY KEY(cpf),
-	CONSTRAINT unkcandidato
-		UNIQUE (c_numero, sequencial),
 	CONSTRAINT fkcandidato1
 		FOREIGN KEY(e_vice) REFERENCES candidato(cpf) 
-		ON DELETE RESTRICT ON UPDATE CASCADE,
+		ON DELETE SET NULL ON UPDATE CASCADE,
 	CONSTRAINT fkcandidato2
 		FOREIGN KEY(c_numero) REFERENCES partido(p_numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE
@@ -82,17 +80,16 @@ CREATE TABLE eleicao(
  	brancos int,
 	nulos int,
 	CONSTRAINT pkeleicao
-		PRIMARY KEY(ano,turno) 
+		PRIMARY KEY(ano,turno), 
 	CONSTRAINT fkeleicao1
 		FOREIGN KEY(sec_numero) REFERENCES secao(sec_numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE
-
 );
 
 CREATE TABLE vencedor(
-	vencedor int,
-	ano int,
-	turno int,
+	vencedor int not null,
+	ano int not null,
+	turno int not null,
 	CONSTRAINT pkvencedor
 		PRIMARY KEY(vencedor, ano, turno),
 	CONSTRAINT fkvencedor1
@@ -103,7 +100,7 @@ CREATE TABLE estado(
 	nome char(3) not null,
 	ze_numero int not null,
 	CONSTRAINT pkestado
-		PRIMARY KEY(nome)
+		PRIMARY KEY(nome),
 	CONSTRAINT fkestado2
 		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE
@@ -160,4 +157,13 @@ CREATE TABLE concorre(
 		ON DELETE RESTRICT ON UPDATE CASCADE		
 );
 
+CREATE TABLE hist_cand(
+	ano int not null,
+	turno int not null,
+	cpf int not null,
+	nome varchar(40) not null,
+	p_numero int not null,
+	CONSTRAINT pkhist_cand
+		PRIMARY KEY(ano, turno, cpf, nome, p_numero)
+);
 --filiado fraca
