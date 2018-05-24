@@ -2,10 +2,20 @@ CREATE TABLE eleitor(
 	nome varchar(40) not null,
 	cpf int not null,
 	titulo int not null,
+	ze_numero int not null,
+	ano int not null,
+	turno int not null,
+	validacao boolean not null,
 	CONSTRAINT pkeleitor
 		PRIMARY KEY(cpf),
 	CONSTRAINT UNkeleitor1
-		UNIQUE (titulo)
+		UNIQUE (titulo),
+	CONSTRAINT fkeleitor2
+		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
+		ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT fkeleitor3
+		FOREIGN KEY(ano, turno) REFERENCES eleicao(ano, turno)
+		ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE candidato(
@@ -35,9 +45,13 @@ CREATE TABLE zona_eleitoral(
 
 CREATE TABLE secao(
 	sec_numero int not null,
+	ze_numero int not null,
 	total_eleitores int,
 	CONSTRAINT pksecao
-		PRIMARY KEY(sec_numero)
+		PRIMARY KEY(sec_numero),
+	CONSTRAINT fksecao1
+		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
+		ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE mesario(
@@ -63,8 +77,16 @@ CREATE TABLE partido(
 CREATE TABLE eleicao(
 	ano int not null,
 	turno int not null,
+	sec_numero int not null,
+	validos int,
+ 	brancos int,
+	nulos int,
 	CONSTRAINT pkeleicao
-		PRIMARY KEY(ano,turno)
+		PRIMARY KEY(ano,turno) 
+	CONSTRAINT fkeleicao1
+		FOREIGN KEY(sec_numero) REFERENCES secao(sec_numero)
+		ON DELETE RESTRICT ON UPDATE CASCADE
+
 );
 
 CREATE TABLE vencedor(
@@ -79,80 +101,23 @@ CREATE TABLE vencedor(
 
 CREATE TABLE estado(
 	nome char(3) not null,
+	ze_numero int not null,
 	CONSTRAINT pkestado
 		PRIMARY KEY(nome)
-);
-
-CREATE TABLE registrou(
-	ano int not null,
-	turno int not null,
-	sec_numero int not null,
-	validos int,
- 	brancos int,
-	nulos int, 
-	CONSTRAINT pkregistrou
-		PRIMARY KEY(ano, turno, sec_numero),
-	CONSTRAINT fkregistrou1
-		FOREIGN KEY(ano, turno) REFERENCES eleicao(ano, turno)
-		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fkregistrou2
-		FOREIGN KEY(sec_numero) REFERENCES secao(sec_numero)
-		ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-CREATE TABLE participa(
-	cpf int not null,
-	ano int not null,
-	turno int not null,
-	validacao boolean,
-	CONSTRAINT pkparticipa
-		PRIMARY KEY(cpf, ano, turno),
-	CONSTRAINT fkparticipa1
-		FOREIGN KEY(ano, turno) REFERENCES eleicao(ano, turno)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT fkparticipa3
-		FOREIGN KEY(cpf) REFERENCES eleitor(cpf)
-		ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-CREATE TABLE vinculado(
-	cpf int not null,
-	ze_numero int not null,
-	CONSTRAINT pkvinculado
-		PRIMARY KEY(cpf, ze_numero),
-	CONSTRAINT fkvinculado1
-		FOREIGN KEY(cpf) REFERENCES eleitor(cpf)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT fkvinculado2
+	CONSTRAINT fkestado2
 		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE dividida_em(
-	sec_numero int not null,
-	ze_numero int not null,
-	CONSTRAINT pkdividida_em
-		PRIMARY KEY(sec_numero, ze_numero),
-	CONSTRAINT fkdividida_em1
-		FOREIGN KEY(sec_numero) REFERENCES secao(sec_numero)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT fkdividida_em2
-		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
-		ON DELETE RESTRICT ON UPDATE CASCADE
-);
+--colpsado registrou
 
-CREATE TABLE pertence(
-	nome char(3) not null,
-	ze_numero int not null,
-	CONSTRAINT pkpertence
-		PRIMARY KEY(ze_numero, nome),
-	CONSTRAINT fkpertence1
-		FOREIGN KEY(nome) REFERENCES estado(nome)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT fkpertence2
-		FOREIGN KEY(ze_numero) REFERENCES zona_eleitoral(ze_numero)
-		ON DELETE RESTRICT ON UPDATE CASCADE
-);
+--colpsado participa 
+
+--colapsado vinculado
+
+--colapsado divido_em
+
+--colapsado pertence
 
 CREATE TABLE trabalham(
 	sec_numero int not null,
@@ -195,15 +160,4 @@ CREATE TABLE concorre(
 		ON DELETE RESTRICT ON UPDATE CASCADE		
 );
 
-CREATE TABLE filiado(
-	cpf int not null,
-	numero int not null,
-	CONSTRAINT pkfiliado
-		PRIMARY KEY(cpf, numero),
-	CONSTRAINT fkfiliado1
-		FOREIGN KEY(cpf) REFERENCES candidato(cpf)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT fkfiliado2
-		FOREIGN KEY(numero) REFERENCES partido(p_numero)
-		ON DELETE RESTRICT ON UPDATE CASCADE	
-); 
+--filiado fraca
