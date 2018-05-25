@@ -157,6 +157,7 @@ CREATE TABLE concorre(
 		ON DELETE RESTRICT ON UPDATE CASCADE		
 );
 
+
 CREATE TABLE hist_cand(
 	ano int not null,
 	turno int not null,
